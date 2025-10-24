@@ -5,6 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="app-title-tag">LSD Tolerance Model (WebGL Rainbow)</title>
     
+    <!-- SEO and Metadata -->
+    <meta name="description" content="Educational LSD Tolerance Calculator based on a 7-day receptor downregulation model. Includes a WebGL rainbow background and multilingual support.">
+    <meta name="keywords" content="LSD, tolerance, calculator, dosing, psychedelic, 5-HT2A, microdosing, pharmacology, WebGL, three.js">
+    <meta name="author" content="Gemini Model">
+
+    <!-- Social Media / Open Graph Tags -->
+    <meta property="og:title" content="LSD Tolerance Model: Time-based Dosing Calculator">
+    <meta property="og:description" content="Estimate dose adjustments based on time elapsed since the last dose using a standard 7-day tolerance model. Educational tool with a dynamic WebGL background.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://lsd-tolerance-calc.onrender.com/">
+    
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="LSD Tolerance Model: Time-based Dosing Calculator">
+    <meta name="twitter:description" content="Educational LSD Tolerance Calculator based on a 7-day receptor downregulation model.">
+
+    <!-- Search Engine Verification Tags (PLACEHOLDERS) -->
+    <meta name="google-site-verification" content="[YOUR_GOOGLE_VERIFICATION_CODE]" />
+    <meta name="msvalidate.01" content="[YOUR_BING_VERIFICATION_CODE]" />
+    <meta name="yandex-verification" content="[YOUR_YANDEX_VERIFICATION_CODE]" />
+    
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Load Three.js for WebGL Animation -->
@@ -38,16 +59,14 @@
 
         /* Main Container Styling (Foreground Layer) */
         .container-wrapper {
-            /* This margin (my-auto) helps center the content vertically within its flex parent when there is extra space. */
             margin-top: auto;
             margin-bottom: auto;
-
             position: relative; 
-            z-index: 10; /* Ensures it is always the foreground */
+            z-index: 10; 
             background-color: rgba(26, 0, 48, 0.75); 
             border: 1px solid rgba(167, 139, 250, 0.4); 
             box-shadow: 0 0 40px rgba(167, 139, 250, 0.6), 0 0 20px rgba(192, 38, 211, 0.5);
-            backdrop-filter: blur(12px); /* Stronger frosted glass effect for readability */
+            backdrop-filter: blur(12px); 
         }
 
         /* Header Styling */
@@ -117,10 +136,19 @@
             box-shadow: 0 0 15px rgba(239, 68, 68, 0.3); 
             color: #fca5a5; 
         }
+        
+        /* Highlight active language button */
+        .lang-btn.active {
+            background-color: #5b21b6; /* darker indigo */
+            box-shadow: 0 0 10px rgba(167, 139, 250, 0.5);
+            font-weight: bold;
+        }
 
     </style>
     <script>
-        // --- MULTILINGUAL DATA ---
+        // --- CONSTANTS AND DATA ---
+        const LANG_STORAGE_KEY = 'lsd_calc_lang';
+
         const LANGUAGES = {
             'EN': {
                 font: 'Montserrat, sans-serif', dir: 'ltr',
@@ -291,23 +319,32 @@
             renderer.render(scene, camera);
         }
 
-        // --- CALCULATION AND UI LOGIC ---
+        // --- LANGUAGE LOGIC ---
 
-        /** Updates the entire application UI based on the selected language. */
+        /** Tries to determine the initial language from browser settings. */
+        function getSystemLanguageCode() {
+            const userLang = (navigator.language || navigator.userLanguage).substring(0, 2).toUpperCase();
+            if (userLang === 'RU') return 'RU';
+            if (userLang === 'HE') return 'HE';
+            // Default to English if system language isn't explicitly supported
+            return 'EN';
+        }
+
+        /** Updates the entire application UI based on the selected language and persists the choice. */
         function updateUI(langCode) {
             currentLang = langCode;
             const langData = LANGUAGES[langCode];
             const body = document.body;
             const container = document.querySelector('.container-wrapper');
 
-            // Set Directionality (RTL/LTR)
+            // 1. Set Directionality (RTL/LTR)
             body.style.direction = langData.dir;
             container.classList.toggle('rtl', langData.dir === 'rtl');
             
-            // Set Font
+            // 2. Set Font
             body.style.fontFamily = langData.font;
 
-            // Update all static text content
+            // 3. Update all static text content
             document.getElementById('app-title-tag').textContent = `${langData.title_main} (${langData.title_sub.replace(' (', '').replace(')', '')})`;
             document.getElementById('title-main').textContent = langData.title_main;
             document.getElementById('title-sub').textContent = langData.title_sub;
@@ -319,11 +356,26 @@
             document.getElementById('button-calculate').textContent = langData.button_calculate;
             document.getElementById('disclaimer-title').innerHTML = langData.disclaimer_title;
             document.getElementById('disclaimer-body').textContent = langData.disclaimer_body;
+            
+            // 4. Update active language button state
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-indigo-700', 'ring-2', 'ring-indigo-400');
+                btn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+                if (btn.getAttribute('data-lang') === langCode) {
+                    btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+                    btn.classList.add('active', 'bg-indigo-700', 'ring-2', 'ring-indigo-400');
+                }
+            });
 
-            // Clear old output and re-calculate to update dynamic texts (errors/results)
+            // 5. Persist the selected language using localStorage
+            localStorage.setItem(LANG_STORAGE_KEY, langCode);
+
+            // 6. Clear old output (to prevent language mix-up)
             document.getElementById('output').innerHTML = '';
         }
 
+        // --- CALCULATION LOGIC (Unchanged) ---
+        
         /** Translates status codes into the current language text. */
         function getStatusText(multiplier) {
             if (multiplier === 1.0) return LANGUAGES[currentLang].status_baseline;
@@ -440,7 +492,14 @@
             // 1. Initialize WebGL background
             initWebGL(); 
 
-            // 2. Set default time
+            // 2. Determine initial language: Check storage, then system, then default to EN
+            let initialLang = localStorage.getItem(LANG_STORAGE_KEY);
+            if (!initialLang) {
+                initialLang = getSystemLanguageCode();
+            }
+            currentLang = initialLang;
+            
+            // 3. Set default time (48 hours ago for easy testing)
             const now = new Date();
             const defaultTime = new Date(now.getTime() - (48 * 60 * 60 * 1000));
             const formatTime = (date) => {
@@ -453,7 +512,7 @@
             };
             document.getElementById('lastDoseTime').value = formatTime(defaultTime);
             
-            // 3. Set initial language
+            // 4. Set initial language UI
             updateUI(currentLang);
         }
 
@@ -465,15 +524,14 @@
     <canvas id="webgl-container"></canvas>
 
     <!-- 2. Main Calculator Content (Foreground) -->
-    <!-- NEW FLEX CONTAINER: Centered for large screens, top-aligned and scrollable for small screens. -->
     <div class="absolute inset-0 z-10 p-4 sm:p-8 flex items-start sm:items-center justify-center overflow-auto">
         <div class="max-w-xl w-full container-wrapper rounded-xl shadow-2xl overflow-hidden">
             
             <!-- Language Selector -->
             <div class="p-4 flex justify-center space-x-2 bg-gray-900 border-b border-purple-700">
-                <button onclick="updateUI('EN')" class="text-sm px-3 py-1 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 transition">English</button>
-                <button onclick="updateUI('RU')" class="text-sm px-3 py-1 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 transition">Русский</button>
-                <button onclick="updateUI('HE')" class="text-sm px-3 py-1 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 transition">עברית</button>
+                <button onclick="updateUI('EN')" data-lang="EN" class="lang-btn text-sm px-3 py-1 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 transition">English</button>
+                <button onclick="updateUI('RU')" data-lang="RU" class="lang-btn text-sm px-3 py-1 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 transition">Русский</button>
+                <button onclick="updateUI('HE')" data-lang="HE" class="lang-btn text-sm px-3 py-1 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 transition">עברית</button>
             </div>
 
             <!-- Header -->
@@ -552,4 +610,3 @@
     </div>
 </body>
 </html>
-
