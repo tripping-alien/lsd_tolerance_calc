@@ -74,7 +74,7 @@ To run this project locally:
 
 1.  Clone the repository:
     ```bash
-    git clone [your-repo-link]
+    git clone https://github.com/tripping-alien/lsd_tolerance_calc.git
     ```
 2.  Navigate to the project directory.
 3.  Open `index.html` in your web browser.
