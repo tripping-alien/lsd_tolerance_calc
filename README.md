@@ -2,6 +2,13 @@ LSD Tolerance Model: Time-based Dosing Calculator
 🌈 Project Overview
 The LSD Tolerance Model is an educational web application designed to estimate the required dose adjustment for LSD based on the time elapsed since the last dose. It leverages a commonly referenced pharmacological model of rapid tolerance and receptor downregulation, which suggests a return to baseline sensitivity over approximately seven days.
 The app features a responsive design, multi-language support (English, Russian, Hebrew), and a hypnotic, real-time WebGL background animation built with Three.js to complement the psychedelic theme.
+📄 Table of Contents
+ * 🚀 Live Demo
+ * ✨ Features
+ * 🧠 The Tolerance Model (Pharmacology)
+ * ⚠️ Essential Disclaimer
+ * 💻 Technology Stack
+ * ⚙️ Development & Usage
 🚀 Live Demo
 You can view the live, fully responsive application here:
 👉 https://lsd-tolerance-calc.onrender.com/
