@@ -48,7 +48,7 @@ The calculator uses a common, step-wise approximation model for 5-HT2A receptor 
 | 7+ Days      | 1.0x (Full Reset)    | Baseline |
 
 The required dose is calculated as:
-$$\text{Required Dose} = \text{Desired Effect Dose} \times \text{Tolerance Multiplier}$$
+Required Dose = Desired Effect Dose times Tolerance Multiplier
 
 -----
 
