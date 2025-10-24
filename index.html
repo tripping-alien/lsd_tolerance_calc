@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="app-title-tag">LSD Tolerance Model (WebGL Rainbow)</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Three.js for WebGL Animation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        /* Custom font and basic body styling */
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Playfair+Display:wght@700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;700&display=swap'); /* Hebrew/RTL Font */
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: #e0e7ff; /* Light purple text for contrast */
+            overflow: hidden; /* Prevent scrolls due to full-screen canvas */
+            transition: font-family 0.5s;
+            position: relative; 
+            margin: 0;
+            padding: 0;
+        }
+
+        /* WebGL Canvas Styling (Background Layer) */
+        #webgl-container { 
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            z-index: 0; /* Ensures it is always the background */
+        }
+
+        /* Main Container Styling (Foreground Layer) */
+        .container-wrapper {
+            /* This margin (my-auto) helps center the content vertically within its flex parent when there is extra space. */
+            margin-top: auto;
+            margin-bottom: auto;
+
+            position: relative; 
+            z-index: 10; /* Ensures it is always the foreground */
+            background-color: rgba(26, 0, 48, 0.75); 
+            border: 1px solid rgba(167, 139, 250, 0.4); 
+            box-shadow: 0 0 40px rgba(167, 139, 250, 0.6), 0 0 20px rgba(192, 38, 211, 0.5);
+            backdrop-filter: blur(12px); /* Stronger frosted glass effect for readability */
+        }
+
+        /* Header Styling */
+        .header-bg {
+            background: linear-gradient(90deg, #8b5cf6, #c026d3); 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .header-bg h1 {
+            font-family: 'Playfair Display', serif; 
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+        }
+
+        /* Input and Button Styling (Same as before, ensuring contrast) */
+        .input-field {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(167, 139, 250, 0.5);
+            color: #e0e7ff;
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #a78bfa;
+            box-shadow: 0 0 10px rgba(167, 139, 250, 0.6);
+        }
+        .input-field::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+        .calculate-btn {
+            background: linear-gradient(90deg, #c026d3, #a78bfa); 
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
+        }
+        .calculate-btn:hover {
+            background: linear-gradient(90deg, #a78bfa, #c026d3); 
+            transform: scale(1.02) rotate(1deg);
+            box-shadow: 0 6px 20px rgba(167, 139, 250, 0.6);
+        }
+        .calculate-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Result Box Styling */
+        .result-box {
+            background-color: rgba(0, 0, 0, 0.4); 
+            border-left: 4px solid #c026d3; 
+            box-shadow: 0 0 15px rgba(192, 38, 211, 0.4); 
+            animation: fadeIn 0.8s ease-out; 
+        }
+        .rtl .result-box {
+            border-left: none;
+            border-right: 4px solid #c026d3; 
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .result-box .text-purple-700 {
+            color: #c026d3; 
+            text-shadow: 0 0 12px rgba(192, 38, 211, 1); 
+        }
+        
+        /* Disclaimer Styling */
+        .disclaimer-box {
+            background-color: rgba(255, 255, 255, 0.1); 
+            border: 1px solid rgba(239, 68, 68, 0.4); 
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.3); 
+            color: #fca5a5; 
+        }
+
+    </style>
+    <script>
+        // --- MULTILINGUAL DATA ---
+        const LANGUAGES = {
+            'EN': {
+                font: 'Montserrat, sans-serif', dir: 'ltr',
+                title_main: 'LSD Tolerance Model', title_sub: 'Time-based Dosing Calculator (Educational)',
+                info_paragraph: 'This model provides an estimated dose adjustment based on the principle of rapid psychedelic tolerance (5-HT2A receptor downregulation) and a 7-day reversal period, as suggested by pharmacological studies and common models.',
+                label_time: 'Time of Last Dose Taken:', label_last_dose: 'Dose Taken Last Time (μg):', label_desired_dose: 'Dose for Desired Effect (μg):', label_desired_sub: '(The dose you want to *feel* the effects of today.)',
+                button_calculate: 'Calculate Required Dose', results_title: 'Tolerance Calculation Results',
+                result_elapsed_time: 'Time Elapsed:', result_multiplier: 'Tolerance Multiplier:', result_status: 'Tolerance Status:',
+                result_required_dose_pre: 'Required Dose to match', result_wait_advice_pre: 'For a full reset (Multiplier 1.0x), it is recommended to wait an additional',
+                result_days_and: 'days and', result_hours: 'hours.', result_calculation_pre: 'Dose calculation:',
+                result_desired_dose_post: '(Desired)', result_multiplier_post: '(Multiplier)',
+                disclaimer_title: '⚠️ Essential Disclaimer',
+                disclaimer_body: 'This calculator is based on general pharmacological models and historical data. LSD effects and tolerance development are highly individualized and depend on metabolism, body weight, genetics, and environment. **This tool is for educational purposes only and is NOT a substitute for professional medical advice.** Do not use this tool to determine actual dosing.',
+                error_fill_all: 'Please fill in all input fields.', error_time_past: 'Last dose time must be in the past.', error_dose_positive: 'Dose values must be greater than 0 μg.',
+                status_baseline: 'Baseline Sensitivity (Tolerance Fully Reset)', status_high: 'High Tolerance (Effects Severely Diminished)',
+                status_moderate: 'Moderate Tolerance', status_low: 'Low Tolerance (Trace Effects Remaining)',
+            },
+            'RU': {
+                font: 'Montserrat, sans-serif', dir: 'ltr',
+                title_main: 'Модель толерантности ЛСД', title_sub: 'Калькулятор дозировки, основанный на времени (Образовательный)',
+                info_paragraph: 'Эта модель предоставляет предполагаемую корректировку дозы, основанную на принципе быстрого развития толерантности к психоделикам (десенсибилизация рецепторов 5-HT2A) и 7-дневному периоду восстановления, как предполагают фармакологические исследования и общепринятые модели.',
+                label_time: 'Время последнего приема дозы:', label_last_dose: 'Доза, принятая в прошлый раз (мкг):', label_desired_dose: 'Доза для желаемого эффекта (мкг):', label_desired_sub: '(Доза, эффект которой вы хотите *почувствовать* сегодня.)',
+                button_calculate: 'Рассчитать требуемую дозу', results_title: 'Результаты расчета толерантности',
+                result_elapsed_time: 'Прошло времени:', result_multiplier: 'Коэффициент толерантности:', result_status: 'Статус толерантности:',
+                result_required_dose_pre: 'Требуемая доза для соответствия', result_wait_advice_pre: 'Для полного сброса (Множитель 1.0x) рекомендуется подождать дополнительно',
+                result_days_and: 'дней и', result_hours: 'часов.', result_calculation_pre: 'Расчет дозы:',
+                result_desired_dose_post: '(Желаемая)', result_multiplier_post: '(Множитель)',
+                disclaimer_title: '⚠️ Важное предупреждение',
+                disclaimer_body: 'Этот калькулятор основан на общих фармакологических моделях и исторических данных. Эффекты ЛСД и развитие толерантности строго индивидуальны и зависят от метаболизма, веса, генетики и окружающей среды. **Этот инструмент предназначен только для образовательных целей и НЕ заменяет профессиональную медицинскую консультацию.** Не используйте этот инструмент для определения фактической дозировки.',
+                error_fill_all: 'Пожалуйста, заполните все поля ввода.', error_time_past: 'Время последнего приема дозы должно быть в прошлом.', error_dose_positive: 'Значения дозы должны быть больше 0 мкг.',
+                status_baseline: 'Базовая чувствительность (толерантность полностью сброшена)', status_high: 'Высокая толерантность (эффекты сильно снижены)',
+                status_moderate: 'Умеренная толерантность', status_low: 'Низкая толерантность (остаточные эффекты)',
+            },
+            'HE': {
+                font: 'Rubik, sans-serif', dir: 'rtl',
+                title_main: 'מודל סבילות LSD', title_sub: 'מחשבון מינון מבוסס זמן (חינוכי)',
+                info_paragraph: 'מודל זה מספק התאמת מינון משוערת המבוססת על עקרון הפיתוח המהיר של סבילות לפסיכדלים (ויסות מטה של קולטני 5-HT2A) ותקופת איפוס של 7 ימים, כפי שמוצע במחקרים פרמקולוגיים ובמודלים נפוצים.',
+                label_time: 'זמן לקיחת המינון האחרון:', label_last_dose: 'מינון שנלקח בפעם האחרונה (μg):', label_desired_dose: 'מינון להשפעה הרצויה (μg):', label_desired_sub: '(המינון שאתם רוצים *להרגיש* את השפעתו היום.)',
+                button_calculate: 'חשב את המינון הנדרש', results_title: 'תוצאות חישוב סבילות',
+                result_elapsed_time: 'זמן שחלף:', result_multiplier: 'מכפיל הסבילות:', result_status: 'סטטוס סבילות:',
+                result_required_dose_pre: 'המינון הנדרש כדי להתאים ל-', result_wait_advice_pre: 'לאיפוס מלא (מכפיל 1.0x) מומלץ לחכות',
+                result_days_and: 'ימים ו-', result_hours: 'שעות.', result_calculation_pre: 'חישוב מינון:',
+                result_desired_dose_post: '(רצוי)', result_multiplier_post: '(מכפיל)',
+                disclaimer_title: '⚠️ הצהרה חיונית',
+                disclaimer_body: 'מחשבון זה מבוסס על מודלים פרמקולוגיים כלליים ונתונים היסטוריים. השפעות LSD ופיתוח סבילות הן אינדיבידואליות ביותר ותלויות במטבוליזם, משקל גוף, גנטיקה וסביבה. **כלי זה מיועד למטרות חינוכיות בלבד ואינו מהווה תחליף לייעוץ רפואי מקצועי.** אין להשתמש בכלי זה לקביעת מינון בפועל.',
+                error_fill_all: 'אנא מלא את כל שדות הקלט.', error_time_past: 'זמן המינון האחרון חייב להיות בעבר.', error_dose_positive: 'ערכי המינון חייבים להיות גדולים מ-0 μg.',
+                status_baseline: 'רגישות בסיס (הסבילות אופסה לחלוטין)', status_high: 'סבילות גבוהה (ההשפעות מופחתות משמעותית)',
+                status_moderate: 'סבילות בינונית', status_low: 'סבילות נמוכה (השפעות קלושות נותרו)',
+            }
+        };
+
+        let currentLang = 'EN';
+        
+        // --- THREE.JS (WEBGL) SETUP ---
+        let scene, camera, renderer, uniforms;
+        const clock = new THREE.Clock();
+
+        const VERTEX_SHADER = `
+            varying vec2 vUv;
+            void main() {
+                vUv = uv;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+        `;
+
+        const FRAGMENT_SHADER = `
+            precision highp float;
+            uniform float uTime;
+            uniform vec2 uResolution;
+            varying vec2 vUv;
+            
+            // Re-map a value from one range to another
+            float map(float value, float min1, float max1, float min2, float max2) {
+                return min2 + (value - min1) * (max2 - min1) / (max1 - min1);
+            }
+
+            void main() {
+                // Center and adjust aspect ratio
+                vec2 p = (vUv * 2.0 - 1.0);
+                p.x *= uResolution.x / uResolution.y;
+
+                // Introduce radial turbulence for a spiraling effect
+                float angle = atan(p.y, p.x);
+                float radius = length(p);
+                
+                // Add shifting waves to the coordinates
+                float wave1 = sin(radius * 15.0 + uTime * 2.0) * 0.05;
+                float wave2 = cos(angle * 5.0 + uTime * 1.5) * 0.03;
+                
+                // Offset coordinates based on time and wave
+                vec2 offset = vec2(wave1, wave2);
+                vec2 twisted_p = p + offset;
+                
+                // Recalculate based on twisted coordinates
+                angle = atan(twisted_p.y, twisted_p.x);
+                radius = length(twisted_p);
+
+                // --- RAINBOW COLOR GENERATION ---
+                // Use angle for rainbow spread and time for shifting/pulsing
+                float speed = uTime * 0.2;
+                
+                vec3 color_shift = vec3(
+                    cos(angle * 3.0 + speed) * 0.5 + 0.5, // Red channel
+                    sin(angle * 3.0 + speed + 2.0) * 0.5 + 0.5, // Green channel
+                    cos(angle * 3.0 + speed + 4.0) * 0.5 + 0.5 // Blue channel
+                );
+                
+                // Add a second layer of movement based on radius for extra psychedelia
+                float pulse_speed = sin(radius * 5.0 - uTime * 1.0) * 0.5 + 0.5;
+                color_shift *= pulse_speed;
+
+                // Use radius to create a light spot in the center (vignette effect)
+                float vignette = smoothstep(0.0, 1.0, radius * 1.5);
+                color_shift *= (1.0 - vignette * 0.05); // slight edge darkening
+                
+                gl_FragColor = vec4(color_shift, 1.0);
+            }
+        `;
+        
+        /** Initializes the Three.js scene, camera, and shader material. */
+        function initWebGL() {
+            const container = document.getElementById('webgl-container');
+            
+            // 1. Scene setup
+            scene = new THREE.Scene();
+            
+            // 2. Camera setup (Orthographic for 2D screen-filling)
+            camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+            
+            // 3. Renderer setup
+            renderer = new THREE.WebGLRenderer({ antialias: true, canvas: container });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            
+            // 4. Shader uniforms (variables passed from JS to GLSL)
+            uniforms = {
+                uTime: { value: 0.0 },
+                uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
+            };
+
+            // 5. Material and Mesh (full screen quad)
+            const material = new THREE.ShaderMaterial({
+                uniforms: uniforms,
+                vertexShader: VERTEX_SHADER,
+                fragmentShader: FRAGMENT_SHADER
+            });
+            const geometry = new THREE.PlaneBufferGeometry(2, 2);
+            const mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+            
+            // Event listeners
+            window.addEventListener('resize', onWindowResize);
+            
+            // Start the animation loop
+            animate();
+        }
+
+        /** Handles window resizing for responsiveness. */
+        function onWindowResize() {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            uniforms.uResolution.value.x = window.innerWidth;
+            uniforms.uResolution.value.y = window.innerHeight;
+        }
+
+        /** Main animation loop (render loop). */
+        function animate() {
+            requestAnimationFrame(animate);
+            uniforms.uTime.value = clock.getElapsedTime();
+            renderer.render(scene, camera);
+        }
+
+        // --- CALCULATION AND UI LOGIC ---
+
+        /** Updates the entire application UI based on the selected language. */
+        function updateUI(langCode) {
+            currentLang = langCode;
+            const langData = LANGUAGES[langCode];
+            const body = document.body;
+            const container = document.querySelector('.container-wrapper');
+
+            // Set Directionality (RTL/LTR)
+            body.style.direction = langData.dir;
+            container.classList.toggle('rtl', langData.dir === 'rtl');
+            
+            // Set Font
+            body.style.fontFamily = langData.font;
+
+            // Update all static text content
+            document.getElementById('app-title-tag').textContent = `${langData.title_main} (${langData.title_sub.replace(' (', '').replace(')', '')})`;
+            document.getElementById('title-main').textContent = langData.title_main;
+            document.getElementById('title-sub').textContent = langData.title_sub;
+            document.getElementById('info-paragraph').textContent = langData.info_paragraph;
+            document.getElementById('label-time').textContent = langData.label_time;
+            document.getElementById('label-last-dose').innerHTML = langData.label_last_dose.replace('(μg):', '(<span class="font-mono">&micro;g</span>):');
+            document.getElementById('label-desired-dose').innerHTML = langData.label_desired_dose.replace('(μg):', '(<span class="font-mono">&micro;g</span>):');
+            document.getElementById('label-desired-sub').textContent = langData.label_desired_sub;
+            document.getElementById('button-calculate').textContent = langData.button_calculate;
+            document.getElementById('disclaimer-title').innerHTML = langData.disclaimer_title;
+            document.getElementById('disclaimer-body').textContent = langData.disclaimer_body;
+
+            // Clear old output and re-calculate to update dynamic texts (errors/results)
+            document.getElementById('output').innerHTML = '';
+        }
+
+        /** Translates status codes into the current language text. */
+        function getStatusText(multiplier) {
+            if (multiplier === 1.0) return LANGUAGES[currentLang].status_baseline;
+            if (multiplier > 2.0) return LANGUAGES[currentLang].status_high;
+            if (multiplier > 1.3) return LANGUAGES[currentLang].status_moderate;
+            return LANGUAGES[currentLang].status_low;
+        }
+
+        /** Calculates the tolerance multiplier. */
+        function getToleranceMultiplier(hoursDiff) {
+            const days = hoursDiff / 24;
+            if (days < 0.5) return 3.5;
+            if (days < 1) return 2.5;
+            if (days < 2) return 1.8;
+            if (days < 3) return 1.4;
+            if (days < 4) return 1.2;
+            if (days < 5) return 1.1;
+            if (days < 6) return 1.05;
+            if (days < 7) return 1.02;
+            return 1.0;
+        }
+
+        /** Calculates the required dose. */
+        function calculateTolerance() {
+            const langData = LANGUAGES[currentLang];
+            const lastDoseTimeInput = document.getElementById('lastDoseTime').value;
+            const lastDoseMgInput = document.getElementById('lastDoseMg').value;
+            const desiredDoseMgInput = document.getElementById('desiredDoseMg').value;
+            const outputDiv = document.getElementById('output');
+            
+            outputDiv.innerHTML = '';
+
+            if (!lastDoseTimeInput || !lastDoseMgInput || !desiredDoseMgInput) {
+                outputDiv.innerHTML = `<p class="text-red-400 font-semibold mt-4">${langData.error_fill_all}</p>`;
+                return;
+            }
+
+            const lastDoseTime = new Date(lastDoseTimeInput).getTime();
+            const lastDose = parseFloat(lastDoseMgInput);
+            const desiredDose = parseFloat(desiredDoseMgInput);
+            const now = new Date().getTime();
+            
+            if (lastDoseTime >= now) {
+                outputDiv.innerHTML = `<p class="text-red-400 font-semibold mt-4">${langData.error_time_past}</p>`;
+                return;
+            }
+
+            if (lastDose <= 0 || desiredDose <= 0) {
+                outputDiv.innerHTML = `<p class="text-red-400 font-semibold mt-4">${langData.error_dose_positive}</p>`;
+                return;
+            }
+
+            const hoursDiff = (now - lastDoseTime) / (1000 * 60 * 60);
+            const daysDiff = hoursDiff / 24;
+
+            const multiplier = getToleranceMultiplier(hoursDiff);
+            const requiredDose = desiredDose * multiplier;
+            
+            const hoursToFullReset = Math.max(0, 168 - hoursDiff);
+            const remainingDays = Math.floor(hoursToFullReset / 24);
+            const remainingHours = Math.round(hoursToFullReset % 24);
+
+            let statusColorClass;
+            const statusText = getStatusText(multiplier);
+
+            if (multiplier === 1.0) statusColorClass = 'status-green';
+            else if (multiplier > 2.0) statusColorClass = 'status-red';
+            else if (multiplier > 1.3) statusColorClass = 'status-orange';
+            else statusColorClass = 'status-yellow';
+
+            // --- HTML Output Generation ---
+            let outputHTML = `
+                <div class="result-box p-4 mt-6 rounded-lg">
+                    <h2 class="text-xl font-bold mb-3">${langData.results_title}</h2>
+                    
+                    <p class="mb-2 text-lg">
+                        <span class="font-semibold">${langData.result_elapsed_time}</span> 
+                        <span class="text-blue-600">${daysDiff.toFixed(1)} ${langData.result_days_and.split(' ')[0]} (${hoursDiff.toFixed(0)} ${langData.result_hours.replace('.', '')})</span>
+                    </p>
+
+                    <p class="text-lg mb-2">
+                        <span class="font-semibold">${langData.result_multiplier}</span> 
+                        <span class="text-blue-600 font-mono text-xl">${multiplier.toFixed(2)}x</span>
+                    </p>
+
+                    <p class="text-lg mb-4">
+                        <span class="font-semibold">${langData.result_status}</span> 
+                        <span class="${statusColorClass} font-bold">${statusText}</span>
+                    </p>
+
+                    <div class="p-3 mb-4 bg-gray-900 rounded-md text-xl font-extrabold text-center border border-purple-500">
+                        <span class="text-gray-300">${langData.result_required_dose_pre} ${desiredDose}&micro;g:</span> 
+                        <span class="block text-3xl mt-1 text-purple-700">${requiredDose.toFixed(0)} &micro;g</span>
+                    </div>
+
+                    ${multiplier > 1.0 ? `
+                        <p class="text-sm text-gray-400 mt-4">
+                            ${langData.result_wait_advice_pre} 
+                            <span class="font-bold text-gray-200">${remainingDays} ${langData.result_days_and.split(' ')[0]} ${langData.result_days_and.split(' ')[1]} ${remainingHours} ${langData.result_hours.replace('.', '')}.</span>
+                        </p>
+                    ` : ''}
+
+                    <p class="text-xs italic mt-4 text-gray-500">
+                        (${langData.result_calculation_pre} ${desiredDose} &micro;g ${langData.result_desired_dose_post} &times; ${multiplier.toFixed(2)} ${langData.result_multiplier_post} = ${requiredDose.toFixed(0)} &micro;g)
+                    </p>
+                </div>
+            `;
+
+            outputDiv.innerHTML = outputHTML;
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = function() {
+            // 1. Initialize WebGL background
+            initWebGL(); 
+
+            // 2. Set default time
+            const now = new Date();
+            const defaultTime = new Date(now.getTime() - (48 * 60 * 60 * 1000));
+            const formatTime = (date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                return `${year}-${month}-${day}T${hours}:${minutes}`;
+            };
+            document.getElementById('lastDoseTime').value = formatTime(defaultTime);
+            
+            // 3. Set initial language
+            updateUI(currentLang);
+        }
+
+    </script>
+</head>
+<body class="min-h-screen">
+    
+    <!-- 1. WebGL Canvas (Background) -->
+    <canvas id="webgl-container"></canvas>
+
+    <!-- 2. Main Calculator Content (Foreground) -->
+    <!-- NEW FLEX CONTAINER: Centered for large screens, top-aligned and scrollable for small screens. -->
+    <div class="absolute inset-0 z-10 p-4 sm:p-8 flex items-start sm:items-center justify-center overflow-auto">
+        <div class="max-w-xl w-full container-wrapper rounded-xl shadow-2xl overflow-hidden">
+            
+            <!-- Language Selector -->
+            <div class="p-4 flex justify-center space-x-2 bg-gray-900 border-b border-purple-700">
+                <button onclick="updateUI('EN')" class="text-sm px-3 py-1 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 transition">English</button>
+                <button onclick="updateUI('RU')" class="text-sm px-3 py-1 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 transition">Русский</button>
+                <button onclick="updateUI('HE')" class="text-sm px-3 py-1 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 transition">עברית</button>
+            </div>
+
+            <!-- Header -->
+            <header class="header-bg p-6 text-white text-center">
+                <h1 id="title-main" class="text-2xl sm:text-4xl font-extrabold tracking-wider">
+                    LSD Tolerance Model
+                </h1>
+                <p id="title-sub" class="text-sm sm:text-base mt-2 opacity-90">
+                    Time-based Dosing Calculator (Educational)
+                </p>
+            </header>
+
+            <!-- Main Content -->
+            <main class="p-6">
+                
+                <p id="info-paragraph" class="text-sm text-gray-300 mb-6">
+                    This model provides an estimated dose adjustment based on the principle of rapid psychedelic tolerance (5-HT2A receptor downregulation) and a 7-day reversal period, as suggested by pharmacological studies and common models.
+                </p>
+
+                <div class="space-y-4">
+                    
+                    <!-- Input 1: Time of Last Dose -->
+                    <div class="flex flex-col">
+                        <label for="lastDoseTime" id="label-time" class="text-sm font-medium text-gray-200 mb-1">
+                            Time of Last Dose Taken:
+                        </label>
+                        <input type="datetime-local" id="lastDoseTime" required
+                               class="input-field p-3 border rounded-lg shadow-sm">
+                    </div>
+
+                    <!-- Input 2: Last Dose -->
+                    <div class="flex flex-col">
+                        <label for="lastDoseMg" id="label-last-dose" class="text-sm font-medium text-gray-200 mb-1">
+                            Dose Taken Last Time (<span class="font-mono">&micro;g</span>):
+                        </label>
+                        <input type="number" id="lastDoseMg" value="100" min="1" required
+                               class="input-field p-3 border rounded-lg shadow-sm"
+                               placeholder="e.g., 100">
+                    </div>
+
+                    <!-- Input 3: Desired Effect Dose -->
+                    <div class="flex flex-col">
+                        <label for="desiredDoseMg" id="label-desired-dose" class="text-sm font-medium text-gray-200 mb-1">
+                            Dose for Desired Effect (<span class="font-mono">&micro;g</span>):
+                        </label>
+                        <input type="number" id="desiredDoseMg" value="100" min="1" required
+                               class="input-field p-3 border rounded-lg shadow-sm"
+                               placeholder="e.g., 100">
+                        <p id="label-desired-sub" class="text-xs text-gray-400 mt-1">
+                            (The dose you want to *feel* the effects of today.)
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Calculation Button -->
+                <button onclick="calculateTolerance()" id="button-calculate"
+                        class="calculate-btn w-full mt-8 p-3 text-white font-bold rounded-xl shadow-md">
+                    Calculate Required Dose
+                </button>
+
+                <!-- Output Area -->
+                <div id="output" class="mb-4">
+                    <!-- Results will appear here -->
+                </div>
+
+                <!-- Disclaimer -->
+                <div class="mt-8 p-4 rounded-lg text-xs disclaimer-box">
+                    <h3 id="disclaimer-title" class="font-bold text-sm mb-1">⚠️ Essential Disclaimer</h3>
+                    <p id="disclaimer-body">
+                        This calculator is based on general pharmacological models and historical data. LSD effects and tolerance development are highly individualized and depend on metabolism, body weight, genetics, and environment. **This tool is for educational purposes only and is NOT a substitute for professional medical advice.** Do not use this tool to determine actual dosing.
+                    </p>
+                </div>
+
+            </main>
+        </div>
+    </div>
+</body>
+</html>
+
