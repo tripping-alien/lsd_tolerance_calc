@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://lsd-tolerance-calc.onrender.com/sitemap.xml
+

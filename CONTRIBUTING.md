@@ -15,3 +15,4 @@ Thank you for your interest in contributing! This project is an open-source educ
 3. Submit a clear, descriptive Pull Request.
 
 Please adhere to our [Code of Conduct](CODE_OF_CONDUCT.md).
+

@@ -11,3 +11,4 @@ Security and dependency updates are applied directly to the `main` branch.
 ## Reporting a Vulnerability
 
 If you discover a potential vulnerability, please report it privately to **smalltalkappsandrey@gmail.com**. Please do not file public issues for security vulnerabilities.
+
