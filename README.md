@@ -1,80 +1,166 @@
-# LSD Tolerance Model: Time-based Dosing Calculator
+# 🧪 LSD Tolerance Model: Time-based Dosing Calculator
+
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Render-22c55e?style=for-the-badge&logo=render)](https://lsd-tolerance-calc.onrender.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
+[![Google Verified](https://img.shields.io/badge/Google_Search-Console_Verified-blue?style=for-the-badge)](https://lsd-tolerance-calc.onrender.com/)
+[![Zero Upload](https://img.shields.io/badge/Privacy-100%25%20Client--Side-success?style=flat-square)](index.html)
+[![Languages](https://img.shields.io/badge/i18n-EN%20%7C%20RU%20%7C%20HE-informational?style=flat-square)](index.html)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](CONTRIBUTING.md)
+
+An interactive, educational single-page web application and harm-reduction visualizer designed to estimate required dose adjustments for LSD based on time elapsed since the last dose. It leverages a standard pharmacological kinetics model of rapid tachyphylaxis and 5-HT2A receptor downregulation, predicting a return to baseline receptor sensitivity over approximately seven days.
+
+Hosted live on Render at **[https://lsd-tolerance-calc.onrender.com/](https://lsd-tolerance-calc.onrender.com/)**.
+
+---
+
+![LSD Tolerance Calculator Preview](og-preview.png)
+
+---
+
+## 📑 Table of Contents
+
+- [Project Overview](#-project-overview)
+- [Key Features](#-key-features)
+- [Pharmacological Model & Kinetics](#-the-tolerance-model-pharmacology)
+- [Essential Harm Reduction Disclaimer](#-essential-disclaimer)
+- [Technology Stack](#-technology-stack)
+- [Project Structure](#-project-structure)
+- [Local Development & Usage](#-local-development--usage)
+- [SEO & Social Link Previews](#-seo--social-link-previews)
+- [Community & Contributing](#-community--contributing)
+- [Security Policy](#-security-policy)
+- [License](#-license)
+
+---
 
 ## 🌈 Project Overview
 
-The **LSD Tolerance Model** is an educational web application designed to estimate the required dose adjustment for LSD based on the time elapsed since the last dose. It leverages a commonly referenced pharmacological model of rapid tolerance and receptor downregulation, which suggests a return to baseline sensitivity over approximately seven days.
+The **LSD Tolerance Model** provides an accessible, scientific interface for understanding psychedelic tachyphylaxis. In addition to pharmacokinetic calculations, the application features a responsive layout, multi-language internationalization (English, Russian, Hebrew with full RTL support), and a real-time WebGL background animation built with Three.js and custom GLSL fragment shaders.
 
-The app features a responsive design, multi-language support (English, Russian, Hebrew), and a hypnotic, real-time WebGL background animation built with Three.js to complement the psychedelic theme.
+---
 
-## 📄 Table of Contents
+## ✨ Key Features
 
-1.  [🚀 Live Demo](#-live-demo)
-2.  [✨ Features](#-features)
-3.  [🧠 The Tolerance Model (Pharmacology)](#-the-tolerance-model-pharmacology)
-4.  [⚠️ Essential Disclaimer](#-essential-disclaimer)
-5.  [💻 Technology Stack](#-technology-stack)
-6.  [⚙️ Development & Usage](#-development--usage)
+- **⏱️ Time-Based Calculation**: Determines the required compensatory dose based on last dose time and target desired effect.
+- **🌍 Multilingual & RTL Support**: Native toggle between English (`EN`), Russian (`RU`), and Hebrew (`HE`), including dynamic Right-to-Left layout flow.
+- **🎨 Psychedelic WebGL Background**: Custom, high-efficiency GLSL fragment shader powered by Three.js rendering an ambient rainbow diffraction pattern.
+- **📱 Fully Responsive**: Tailored for smartphones, tablets, and wide monitors with Tailwind CSS.
+- **📊 Real-Time Feedback**: Instant visual indicator showing tolerance multiplier and physiological status (High, Moderate, Low, Baseline).
+- **🔒 100% Client-Side**: Zero data transmission, zero cookies, zero external telemetry.
 
------
-
-## 🚀 Live Demo
-
-You can view the live, fully responsive application here:
-
-👉 **[https://lsd-tolerance-calc.onrender.com/](https://lsd-tolerance-calc.onrender.com/)**
-
-## ✨ Features
-
-  * **Time-Based Calculation:** Determines the required compensatory dose based on the user's last dose time and desired current effect.
-  * **Multilingual Support:** Supports English (`EN`), Russian (`RU`), and Hebrew (`HE`), including dynamic RTL (Right-to-Left) layout switching.
-  * **Psychedelic WebGL Background:** Features a custom, low-overhead fragment shader (GLSL) powered by Three.js to generate a dynamic, mesmerizing rainbow pattern.
-  * **Fully Responsive:** Optimized for mobile, tablet, and desktop viewing, ensuring the calculator card is centered and readable against the animated background.
-  * **Clear Status Feedback:** Provides a tolerance multiplier and a status (e.g., "High Tolerance," "Low Tolerance") for easy understanding.
+---
 
 ## 🧠 The Tolerance Model (Pharmacology)
 
-The calculator uses a common, step-wise approximation model for 5-HT2A receptor downregulation and upregulation recovery. This model estimates the tolerance multiplier needed to achieve the *desired effect* based on the time difference between doses.
+The calculator models 5-HT2A receptor downregulation and upregulation recovery using a standard step-wise kinetic approximation:
 
-| Time Elapsed | Tolerance Multiplier | Status |
-| :----------- | :------------------- | :----- |
-| \< 12 hours   | \~3.5x                | High   |
-| \< 24 hours   | \~2.5x                | High   |
-| \< 48 hours   | \~1.8x                | Moderate |
-| \< 72 hours   | \~1.4x                | Moderate |
-| \< 96 hours   | \~1.2x                | Low    |
-| \< 120 hours  | \~1.1x                | Low    |
-| \< 144 hours  | \~1.05x               | Trace  |
-| \< 168 hours  | \~1.02x               | Trace  |
-| 7+ Days      | 1.0x (Full Reset)    | Baseline |
+| Time Elapsed | Tolerance Multiplier | Status Category |
+| :--- | :--- | :--- |
+| **< 12 hours** | ~3.5x | High Tolerance |
+| **< 24 hours** | ~2.5x | High Tolerance |
+| **< 48 hours** | ~1.8x | Moderate Tolerance |
+| **< 72 hours** | ~1.4x | Moderate Tolerance |
+| **< 96 hours** | ~1.2x | Low Tolerance |
+| **< 120 hours** | ~1.1x | Low Tolerance |
+| **< 144 hours** | ~1.05x | Trace Tolerance |
+| **< 168 hours** | ~1.02x | Trace Tolerance |
+| **7+ Days** | 1.0x (Full Reset) | Baseline Sensitivity |
 
-The required dose is calculated as:
-Required Dose = Desired Effect Dose times Tolerance Multiplier
+### Calculation Formula
 
------
+$$\text{Estimated Dose} = \text{Target Dose} \times M(t)$$
+
+Where $M(t)$ represents the empirical tachyphylaxis multiplier decaying to $1.0$ at $t \ge 168\text{ hours}$.
+
+---
 
 ## ⚠️ Essential Disclaimer
 
-This tool is designed **exclusively for educational purposes** and is based on generalized, simplified pharmacological models and historical community data.
+This tool is designed **exclusively for educational and harm-reduction research purposes**. Individual metabolism, receptor density, set, and setting vary substantially. **DO NOT USE THIS CALCULATOR TO DETERMINE RECREATIONAL DOSING.** The authors and SmallTalk Apps assume no liability for misuse.
 
-**DO NOT USE THIS CALCULATOR TO DETERMINE ACTUAL DOSING.** Individual tolerance and metabolic factors vary widely. This tool is not a substitute for professional medical advice. The developer assumes no responsibility for misuse.
+---
 
 ## 💻 Technology Stack
 
-  * **HTML5:** The core structure of the application.
-  * **Tailwind CSS:** Used for utility-first, responsive styling and layout.
-  * **JavaScript (ES6+):** Handles all calculation logic, UI updates, and language switching.
-  * **Three.js:** Utilized for initializing the WebGL context and managing the scene.
-  * **GLSL (Fragment Shader):** Provides the custom, dynamic rainbow animation.
+- **HTML5 & CSS3**: Semantic foundation styled with Tailwind CSS utility classes.
+- **JavaScript (ES6+)**: Pure client-side calculations, locale dictionary switching, and DOM orchestration.
+- **Three.js & GLSL**: WebGL scene management and procedural fragment shader.
+- **Deployment**: Render Cloud Static Host ([lsd-tolerance-calc.onrender.com](https://lsd-tolerance-calc.onrender.com/)).
 
-## ⚙️ Development & Usage
+---
 
-The entire application is contained within a single `index.html` file, making it extremely easy to deploy or run locally.
+## 🏛️ Project Structure
 
-To run this project locally:
+```
+lsd_tolerance_calc/
+├── index.html                   # Single-page web application & WebGL shader
+├── og-preview.png               # 1200x630 Open Graph & Twitter Card social preview card
+├── preview.png                  # Social preview mirror asset
+├── favicon.ico                  # Multi-resolution binary (16, 24, 32, 48, 64px)
+├── favicon-16x16.png            # 16x16 browser tab favicon
+├── favicon-32x32.png            # 32x32 high-DPI browser tab favicon
+├── apple-touch-icon.png         # 180x180 iOS Home Screen touch icon
+├── android-chrome-192x192.png   # 192x192 Android PWA launcher icon
+├── google4aaea02b9f3d6c9f.html  # Google Search Console ownership verification token
+├── robots.txt                   # Search crawler directives referencing sitemap.xml
+├── sitemap.xml                  # Canonical XML sitemap for Google Search Console
+├── CONTRIBUTING.md              # Community contribution guidelines
+├── CODE_OF_CONDUCT.md           # Contributor Covenant Code of Conduct
+├── SECURITY.md                  # Security vulnerability reporting policy
+├── LICENSE                      # MIT Open Source License
+└── README.md                    # Project documentation
+```
 
-1.  Clone the repository:
-    ```bash
-    git clone https://github.com/tripping-alien/lsd_tolerance_calc.git
-    ```
-2.  Navigate to the project directory.
-3.  Open `index.html` in your web browser.
+---
+
+## ⚙️ Local Development & Usage
+
+Because the application is completely client-side, no compilers or build runners are required.
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/tripping-alien/lsd_tolerance_calc.git
+cd lsd_tolerance_calc
+```
+
+### 2. Run locally
+Double-click `index.html` or launch any local web server:
+
+```bash
+# Python 3
+python -m http.server 8000
+
+# Or Node.js
+npx serve .
+```
+
+Navigate to `http://localhost:8000`.
+
+---
+
+## 🔍 SEO & Social Link Previews
+
+- **Canonical URL**: `https://lsd-tolerance-calc.onrender.com/`
+- **Open Graph / Twitter Cards**: 1200x630 high-resolution branded preview card (`og-preview.png`).
+- **Sitemap & Robots**: Full `sitemap.xml` and `robots.txt` configuration for Google Search indexing.
+- **Structured Data**: Schema.org `WebApplication` JSON-LD specification.
+
+---
+
+## 🤝 Community & Contributing
+
+Contributions to translations, accessibility, and documentation are welcome! Please review [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) before submitting a Pull Request.
+
+---
+
+## 🛡️ Security Policy
+
+Please review our [Security Policy](SECURITY.md) to report vulnerabilities responsibly.
+
+---
+
+## 📄 License
+
+This project is open-source under the **MIT License** — see the [LICENSE](LICENSE) file for terms.
+
+Maintained by **[SmallTalk Apps](https://smalltalkapps.net/)**.
