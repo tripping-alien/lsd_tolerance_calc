@@ -1,4 +1,4 @@
-package net.smalltalkapps.tolerancemodel;
+package net.smalltalkapps.tolerance;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
