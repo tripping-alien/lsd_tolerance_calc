@@ -11,6 +11,10 @@
     <meta name="author" content="SmallTalk Apps">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
     <link rel="canonical" href="https://lsd-tolerance-calc.onrender.com/">
+    <link rel="alternate" hreflang="en" href="https://lsd-tolerance-calc.onrender.com/?lang=EN">
+    <link rel="alternate" hreflang="ru" href="https://lsd-tolerance-calc.onrender.com/?lang=RU">
+    <link rel="alternate" hreflang="he" href="https://lsd-tolerance-calc.onrender.com/?lang=HE">
+    <link rel="alternate" hreflang="x-default" href="https://lsd-tolerance-calc.onrender.com/">
 
     <!-- Open Graph -->
     <meta property="og:title" content="LSD Tolerance Model: Time-based Dosing Calculator">
@@ -678,7 +682,10 @@
     window.onload = function() {
         initWebGL();
 
-        let lang = localStorage.getItem(LANG_STORAGE_KEY) || 
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlLang = urlParams.get('lang')?.toUpperCase();
+        let lang = (urlLang && LANGUAGES[urlLang]) ? urlLang :
+                   localStorage.getItem(LANG_STORAGE_KEY) || 
                    (navigator.language || '').substring(0, 2).toUpperCase();
         if (!LANGUAGES[lang]) lang = 'EN';
         updateUI(lang);
