@@ -1,7 +1,7 @@
 # Google Play Store Listing // Tolerance Model: Kinetics Calc
 
 **Studio**: SmallTalk Apps (Est. 2014)  
-**Package Name**: `com.smalltalkapps.tolerancemodel`  
+**Package Name**: `net.smalltalkapps.tolerancemodel`  
 **Target Canonical URL**: [https://lsd-tolerance-calc.onrender.com](https://lsd-tolerance-calc.onrender.com)  
 **Privacy Policy**: [https://smalltalkapps.net/privacy.html](https://smalltalkapps.net/privacy.html)  
 

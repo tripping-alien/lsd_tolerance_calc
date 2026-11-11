@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'com.smalltalkapps.tolerancemodel'
+    namespace 'net.smalltalkapps.tolerancemodel'
     compileSdk 35
 
     defaultConfig {
-        applicationId "com.smalltalkapps.tolerancemodel"
+        applicationId "net.smalltalkapps.tolerancemodel"
         minSdk 24
         targetSdk 35
         versionCode 1
