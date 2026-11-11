@@ -163,4 +163,4 @@ Please review our [Security Policy](SECURITY.md) to report vulnerabilities respo
 
 This project is open-source under the **MIT License** — see the [LICENSE](LICENSE) file for terms.
 
-Maintained by **[SmallTalk Apps](https://smalltalkapps.net/)**.
+Maintained by **[SmallTalk Apps](https://smalltalkapps.art/)**.
