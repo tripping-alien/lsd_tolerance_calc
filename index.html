@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
     <title id="app-title-tag">LSD Tolerance Calculator — Dosage Kinetics & Reset Calculator</title>
 
     <!-- SEO -->
@@ -94,7 +94,11 @@
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@700&family=Rubik:wght@400;600;700&display=swap');
 
         html, body {
+            max-width: 100vw;
+            overflow-x: hidden;
             overscroll-behavior-y: none;
+            overscroll-behavior: contain;
+            -webkit-text-size-adjust: 100%;
         }
 
         body {
@@ -206,13 +210,54 @@
             border-radius: 9999px;
             transition: width 0.6s ease;
         }
+
+        .scroll-overlay {
+            overscroll-behavior-y: none;
+            overscroll-behavior: contain;
+            padding-top: max(env(safe-area-inset-top, 0px), 12px);
+            padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
+            padding-left: max(env(safe-area-inset-left, 0px), 12px);
+            padding-right: max(env(safe-area-inset-right, 0px), 12px);
+        }
+
+        /* ── RESPONSIVE RESOLUTION BREAKPOINTS ── */
+        @media (max-width: 480px) {
+            .container-wrapper { border-radius: 14px; margin: 6px auto; }
+            .header-bg { padding: 1.25rem 1rem !important; }
+            .header-bg h1 { font-size: 1.35rem !important; }
+            .lang-btn { font-size: 0.72rem !important; padding: 0.25rem 0.55rem !important; }
+            main { padding: 1rem !important; }
+            .calculate-btn { font-size: 0.95rem !important; padding: 0.75rem 1rem !important; }
+        }
+
+        @media (max-width: 360px) {
+            .header-bg h1 { font-size: 1.15rem !important; }
+            .header-bg p { font-size: 0.72rem !important; }
+            .lang-btn { font-size: 0.65rem !important; padding: 0.2rem 0.45rem !important; }
+            .input-field { font-size: 0.82rem !important; padding: 0.4rem 0.6rem !important; }
+            #result-adjusted-dose { font-size: 1.6rem !important; }
+        }
+
+        @media (min-width: 768px) {
+            .container-wrapper { max-width: 620px; }
+        }
+
+        @media (min-width: 1200px) {
+            .container-wrapper { max-width: 680px; }
+        }
+
+        @media (max-height: 520px) and (orientation: landscape) {
+            .scroll-overlay { align-items: flex-start !important; }
+            .container-wrapper { margin: 8px auto; }
+            .header-bg { padding: 0.75rem 1rem !important; }
+        }
     </style>
 </head>
 <body class="min-h-screen">
 
     <canvas id="webgl-container"></canvas>
 
-    <div class="absolute inset-0 z-10 p-3 sm:p-6 flex items-start sm:items-center justify-center overflow-auto">
+    <div class="scroll-overlay absolute inset-0 z-10 p-3 sm:p-6 flex items-start sm:items-center justify-center overflow-auto">
         <div class="max-w-xl w-full container-wrapper rounded-2xl shadow-2xl overflow-hidden my-4">
 
             <!-- Language + Controls -->
