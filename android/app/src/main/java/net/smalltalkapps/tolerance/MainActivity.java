@@ -61,9 +61,11 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
         webSettings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
 
-        // Prevent pull-to-refresh & overscroll bounce completely
-        mWebView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        // Enable smooth native touch scrolling
+        mWebView.setOverScrollMode(View.OVER_SCROLL_IF_CONTENT_SCROLLS);
         mWebView.setVerticalScrollBarEnabled(true);
+        mWebView.setHorizontalScrollBarEnabled(false);
+        mWebView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
 
         // WebChromeClient for Progress
         mWebView.setWebChromeClient(new WebChromeClient() {
