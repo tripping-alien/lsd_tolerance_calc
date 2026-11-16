@@ -91,17 +91,18 @@
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="tailwind.js"></script>
+    <script>if (!window.tailwind) document.write('<script src="https://cdn.tailwindcss.com"><\/script>');</script>
+    <script src="three.min.js"></script>
+    <script>if (!window.THREE) document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');</script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@700&family=Rubik:wght@400;600;700&display=swap');
 
-        html, body {
-            max-width: 100vw;
-            min-height: 100%;
+        html {
+            height: 100%;
             overflow-x: hidden;
-            overflow-y: auto;
+            overflow-y: scroll;
             -webkit-overflow-scrolling: touch;
             touch-action: pan-y;
             -webkit-text-size-adjust: 100%;
@@ -114,6 +115,11 @@
             padding: 0;
             background: #0f001a;
             position: relative;
+            min-height: 100%;
+            overflow-x: hidden;
+            overflow-y: visible;
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
         }
 
         #webgl-container {
@@ -121,7 +127,9 @@
             top: 0; left: 0;
             width: 100vw; height: 100vh;
             z-index: 0;
-            pointer-events: none;
+            pointer-events: none !important;
+            touch-action: none !important;
+            user-select: none;
         }
 
         .container-wrapper {
@@ -131,6 +139,8 @@
             border: 1px solid rgba(167, 139, 250, 0.4);
             box-shadow: 0 0 40px rgba(167, 139, 250, 0.5), 0 0 20px rgba(192, 38, 211, 0.4);
             backdrop-filter: blur(14px);
+            overflow: visible;
+            touch-action: pan-y;
         }
 
         .header-bg {
@@ -222,9 +232,10 @@
             position: relative;
             z-index: 10;
             width: 100%;
-            min-height: 100vh;
+            min-height: 100%;
             overflow: visible;
-            padding-top: max(env(safe-area-inset-top, 0px), 24px);
+            touch-action: pan-y;
+            padding-top: max(env(safe-area-inset-top, 0px), 16px);
             padding-bottom: max(env(safe-area-inset-bottom, 0px), 48px);
             padding-left: max(env(safe-area-inset-left, 0px), 12px);
             padding-right: max(env(safe-area-inset-right, 0px), 12px);
@@ -272,11 +283,11 @@
 
     <canvas id="webgl-container"></canvas>
 
-    <div class="scroll-overlay relative z-10 w-full min-h-screen p-3 sm:p-6 flex flex-col items-center justify-start">
-        <div class="max-w-xl w-full container-wrapper rounded-2xl shadow-2xl overflow-hidden my-4 py-1">
+    <div class="scroll-overlay relative z-10 w-full p-3 sm:p-6 flex flex-col items-center justify-start">
+        <div class="max-w-xl w-full container-wrapper rounded-2xl shadow-2xl my-4 py-1">
 
             <!-- Language + Controls -->
-            <div class="p-3 flex flex-wrap justify-between items-center gap-2 bg-gray-900/80 border-b border-purple-800/50">
+            <div class="p-3 flex flex-wrap justify-between items-center gap-2 bg-gray-900/80 border-b border-purple-800/50 rounded-t-2xl">
                 <div class="flex gap-1.5">
                     <button onclick="updateUI('EN')" data-lang="EN" class="lang-btn text-xs sm:text-sm px-3 py-1.5 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 transition">English</button>
                     <button onclick="updateUI('RU')" data-lang="RU" class="lang-btn text-xs sm:text-sm px-3 py-1.5 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 transition">Русский</button>
@@ -297,7 +308,7 @@
                 </p>
             </header>
 
-            <main class="p-5 sm:p-6">
+            <main class="p-5 sm:p-6 rounded-b-2xl">
                 <p id="info-paragraph" class="text-sm text-gray-300 mb-5 leading-relaxed">
                     This model provides an estimated dose adjustment based on the principle of rapid psychedelic tolerance (5-HT2A receptor downregulation) and a 7-day reversal period.
                 </p>
