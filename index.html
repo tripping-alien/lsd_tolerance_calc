@@ -474,36 +474,83 @@
         uniform vec2 uResolution;
         varying vec2 vUv;
 
+        // Lush iridescent velvet color palette
+        vec3 palette(in float t) {
+            vec3 a = vec3(0.12, 0.08, 0.22);
+            vec3 b = vec3(0.35, 0.25, 0.45);
+            vec3 c = vec3(1.0, 1.0, 1.2);
+            vec3 d = vec3(0.15, 0.42, 0.65);
+            return a + b * cos(6.28318 * (c * t + d));
+        }
+
         void main() {
             vec2 p = (vUv * 2.0 - 1.0);
             p.x *= uResolution.x / uResolution.y;
 
-            float angle = atan(p.y, p.x);
-            float radius = length(p);
+            float t = uTime * 0.22;
 
-            float wave1 = sin(radius * 15.0 + uTime * 2.0) * 0.05;
-            float wave2 = cos(angle * 5.0 + uTime * 1.5) * 0.03;
-            vec2 twisted = p + vec2(wave1, wave2);
-
-            angle = atan(twisted.y, twisted.x);
-            radius = length(twisted);
-
-            float speed = uTime * 0.2;
-            vec3 color = vec3(
-                cos(angle * 3.0 + speed) * 0.5 + 0.5,
-                sin(angle * 3.0 + speed + 2.0) * 0.5 + 0.5,
-                cos(angle * 3.0 + speed + 4.0) * 0.5 + 0.5
+            // Multi-octave organic fluid domain warping
+            vec2 q = vec2(
+                sin(p.x * 2.2 + t * 0.8) + cos(p.y * 1.8 + t * 0.6),
+                cos(p.x * 1.7 - t * 0.7) + sin(p.y * 2.4 + t * 0.5)
             );
 
-            float pulse = sin(radius * 5.0 - uTime) * 0.5 + 0.5;
-            color *= pulse;
+            vec2 r = vec2(
+                sin(p.x * 3.1 + q.x * 1.5 + t * 0.9),
+                cos(p.y * 2.8 + q.y * 1.4 - t * 0.8)
+            );
 
-            float vignette = smoothstep(0.0, 1.2, radius);
-            color *= (1.0 - vignette * 0.15);
+            float len = length(p + r * 0.35);
+            float angle = atan(p.y + r.y * 0.2, p.x + r.x * 0.2);
 
-            gl_FragColor = vec4(color, 1.0);
+            float f = sin(len * 4.0 - t * 1.2) * 0.5 + 0.5;
+            f += sin(angle * 3.0 + t * 0.7) * 0.25;
+
+            vec3 col = palette(f + len * 0.3 + t * 0.1);
+
+            // Bioluminescent glow highlights
+            float glow = 0.04 / (abs(sin(len * 6.0 - t * 1.5)) + 0.06);
+            col += vec3(0.1, 0.4, 0.6) * glow * 0.25;
+
+            // Soft peripheral vignette for crisp card readability
+            float vig = smoothstep(1.5, 0.2, length(p));
+            col *= (0.35 + 0.65 * vig);
+
+            gl_FragColor = vec4(col, 1.0);
         }
     `;
+
+    // ─── Zero-Dependency Algorithmic Sound Engine ───
+    let audioCtx = null;
+    function getAudioCtx() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        return audioCtx;
+    }
+    function playTone(freq, type = 'sine', duration = 0.08, gainPeak = 0.12) {
+        try {
+            const ctx = getAudioCtx();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+            gain.gain.setValueAtTime(0, ctx.currentTime);
+            gain.gain.linearRampToValueAtTime(gainPeak, ctx.currentTime + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + duration + 0.01);
+        } catch (e) {}
+    }
+    function playChime() {
+        playTone(523.25, 'sine', 0.12, 0.15); // C5
+        setTimeout(() => playTone(659.25, 'sine', 0.16, 0.15), 60); // E5
+        setTimeout(() => playTone(783.99, 'sine', 0.22, 0.18), 120); // G5
+    }
+    function playTick() {
+        playTone(880, 'triangle', 0.04, 0.08);
+    }
 
     function initWebGL() {
         const canvas = document.getElementById('webgl-container');
@@ -651,6 +698,7 @@
         const status = getStatus(multiplier, L);
 
         const resultText = `${L.result_required} ${desired}μg → ${required}μg (${multiplier.toFixed(2)}×)`;
+        playChime();
 
         out.innerHTML = `
             <div class="result-box p-5 rounded-xl">
