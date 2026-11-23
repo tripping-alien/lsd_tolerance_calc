@@ -3,22 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-    <title id="app-title-tag">LSD Tolerance Calculator — Dosage Kinetics & Reset Calculator</title>
+    <title id="app-title-tag">LSD Tolerance Model (WebGL Rainbow)</title>
+    <meta name="msvalidate.01" content="2F2A973A3D2E0F40E9B3221A4C6B14ED" />
 
-    <!-- SEO -->
-    <meta name="description" content="Free scientific LSD Tolerance Calculator. Calculate dose adjustments and receptor downregulation using standard 7-to-14 day pharmacological decay models.">
-    <meta name="keywords" content="LSD tolerance calculator, psychedelic tolerance calculator, lsd dose calculator, tolerance reset time, 5-HT2A receptor downregulation, psychedelic dosing interval, harm reduction calculator">
-    <meta name="author" content="SmallTalk Apps">
+    <!-- SEO and Metadata (Original Peak High-Impression Configuration) -->
+    <meta name="description" content="Educational LSD Tolerance Calculator based on a 7-day receptor downregulation model. Includes a WebGL rainbow background and multilingual support.">
+    <meta name="keywords" content="LSD, tolerance, calculator, dosing, psychedelic, 5-HT2A, microdosing, pharmacology, WebGL, three.js">
+    <meta name="author" content="Gemini Model">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
     <link rel="canonical" href="https://lsd-tolerance-calc.onrender.com/">
-    <link rel="alternate" hreflang="en" href="https://lsd-tolerance-calc.onrender.com/?lang=EN">
-    <link rel="alternate" hreflang="ru" href="https://lsd-tolerance-calc.onrender.com/?lang=RU">
-    <link rel="alternate" hreflang="he" href="https://lsd-tolerance-calc.onrender.com/?lang=HE">
-    <link rel="alternate" hreflang="x-default" href="https://lsd-tolerance-calc.onrender.com/">
 
-    <!-- Open Graph -->
+    <!-- Social Media / Open Graph Tags -->
     <meta property="og:title" content="LSD Tolerance Model: Time-based Dosing Calculator">
-    <meta property="og:description" content="Educational tool to estimate dose adjustments based on time since last dose using a standard 7-day tolerance model.">
+    <meta property="og:description" content="Estimate dose adjustments based on time elapsed since the last dose using a standard 7-day tolerance model. Educational tool with a dynamic WebGL background.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://lsd-tolerance-calc.onrender.com/">
     <meta property="og:image" content="https://lsd-tolerance-calc.onrender.com/og-preview.png">
@@ -27,21 +24,21 @@
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
-    <!-- Twitter -->
+    <!-- Twitter Card Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://lsd-tolerance-calc.onrender.com/">
     <meta name="twitter:title" content="LSD Tolerance Model: Time-based Dosing Calculator">
     <meta name="twitter:description" content="Educational LSD Tolerance Calculator based on a 7-day receptor downregulation model.">
     <meta name="twitter:image" content="https://lsd-tolerance-calc.onrender.com/og-preview.png">
 
-    <!-- Schema.org JSON-LD -->
+    <!-- Schema.org WebApplication JSON-LD -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "WebApplication",
-        "name": "LSD Tolerance Calculator",
+        "name": "LSD Tolerance Model",
         "url": "https://lsd-tolerance-calc.onrender.com/",
-        "description": "Scientific pharmacological receptor down-regulation curve calculator estimating dosage equivalents and tolerance over time.",
+        "description": "Educational LSD Tolerance Calculator based on a 7-day receptor downregulation model with dynamic WebGL visuals.",
         "applicationCategory": "EducationalApplication",
         "operatingSystem": "All",
         "offers": {
@@ -49,39 +46,6 @@
             "price": "0",
             "priceCurrency": "USD"
         }
-    }
-    </script>
-
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-            {
-                "@type": "Question",
-                "name": "How does LSD tolerance develop?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "LSD causes rapid tachyphylaxis through immediate downregulation and internalisation of 5-HT2A serotonin receptors. Within hours of consumption, substantial acute tolerance develops, requiring a significantly higher dose to produce equivalent subjective intensity."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "How long does it take for LSD tolerance to reset?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "According to peer-reviewed pharmacological data, approximately 50% of 5-HT2A receptor sensitivity returns by day 3-4, and near-complete baseline sensitivity (90-95%) returns between day 7 and 14."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Is this LSD tolerance calculator private?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Yes. The calculation runs 100% locally in your web browser with zero server data collection or tracking."
-                }
-            }
-        ]
     }
     </script>
 
@@ -608,7 +572,7 @@
         body.style.fontFamily = L.font;
         container.classList.toggle('rtl', L.dir === 'rtl');
 
-        document.getElementById('app-title-tag').textContent = L.title_main;
+        document.getElementById('app-title-tag').textContent = langCode === 'EN' ? 'LSD Tolerance Model (WebGL Rainbow)' : L.title_main;
         document.getElementById('title-main').textContent = L.title_main;
         document.getElementById('title-sub').textContent = L.title_sub;
         document.getElementById('info-paragraph').textContent = L.info_paragraph;
