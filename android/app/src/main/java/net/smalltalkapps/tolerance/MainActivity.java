@@ -103,15 +103,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
+                String scheme = uri != null ? uri.getScheme() : null;
                 String host = uri != null ? uri.getHost() : null;
-                if (host != null && (host.equals(LOCAL_DOMAIN) || host.equals(HOST_DOMAIN) || host.endsWith("onrender.com") || host.endsWith("github.io"))) {
+                if ("https".equalsIgnoreCase(scheme) && (LOCAL_DOMAIN.equalsIgnoreCase(host) || HOST_DOMAIN.equalsIgnoreCase(host))) {
                     return false; // Stay in WebView
                 }
-                // Open external links (e.g. smalltalkapps.art, mailto) in default browser
-                try {
-                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                    startActivity(intent);
-                } catch (Exception ignored) {}
+                // Open safe external links (https, http, mailto, tel) in default browser
+                if ("https".equalsIgnoreCase(scheme) || "http".equalsIgnoreCase(scheme)
+                        || "mailto".equalsIgnoreCase(scheme) || "tel".equalsIgnoreCase(scheme)) {
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                        startActivity(intent);
+                    } catch (Exception ignored) {}
+                }
                 return true;
             }
 
