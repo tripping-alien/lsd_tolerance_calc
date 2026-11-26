@@ -698,7 +698,7 @@
                     </p>
                 ` : ''}
 
-                <button onclick="copyResult(\`${resultText}\`)" 
+                <button onclick="copyResult(this, \`${resultText}\`)" 
                         class="mt-4 text-xs px-3 py-1.5 rounded-full bg-purple-900/50 hover:bg-purple-800 text-purple-200 transition">
                     ${L.copy_btn}
                 </button>
@@ -706,18 +706,23 @@
         `;
     }
 
-    function copyResult(text) {
+    function copyResult(btn, text) {
+        if (!navigator.clipboard || typeof navigator.clipboard.writeText !== 'function') return;
         navigator.clipboard.writeText(text).then(() => {
-            const btn = event.target;
-            const original = btn.textContent;
+            if (!btn) return;
+            if (!btn.dataset.origLabel) btn.dataset.origLabel = btn.textContent;
             btn.textContent = LANGUAGES[currentLang].copied;
-            setTimeout(() => btn.textContent = original, 1500);
-        });
+            setTimeout(() => { btn.textContent = btn.dataset.origLabel; }, 1500);
+        }).catch(() => {});
     }
 
     // --- Init ---
     window.onload = function() {
-        initWebGL();
+        try {
+            initWebGL();
+        } catch (err) {
+            console.warn('WebGL disabled:', err);
+        }
 
         const urlParams = new URLSearchParams(window.location.search);
         const urlLang = urlParams.get('lang')?.toUpperCase();

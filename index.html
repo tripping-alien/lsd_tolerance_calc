@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <!-- Search Snippet Square Thumbnail (Google Search Rich Results) -->
-  <meta name="thumbnail" content="https://tolerance.onrender.com/thumbnail.png">
-  <link rel="image_src" href="https://tolerance.onrender.com/thumbnail.png">
+  <meta name="thumbnail" content="https://lsd-tolerance-calc.onrender.com/og-preview.png">
+  <link rel="image_src" href="https://lsd-tolerance-calc.onrender.com/og-preview.png">
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
@@ -253,10 +253,10 @@
     "@type": "WebPage",
     "name": "Tolerance Model — Receptor Pharmacokinetics Calculator",
     "description": "Scientific pharmacokinetics and receptor down-regulation decay curve simulation model with interactive dosing estimations.",
-    "thumbnailUrl": "https://tolerance.onrender.com/thumbnail.png",
+    "thumbnailUrl": "https://lsd-tolerance-calc.onrender.com/og-preview.png",
     "primaryImageOfPage": {
       "@type": "ImageObject",
-      "url": "https://tolerance.onrender.com/thumbnail.png",
+      "url": "https://lsd-tolerance-calc.onrender.com/og-preview.png",
       "width": 512,
       "height": 512
     }
@@ -718,7 +718,7 @@
                     </p>
                 ` : ''}
 
-                <button onclick="copyResult(\`${resultText}\`)" 
+                <button onclick="copyResult(this, \`${resultText}\`)" 
                         class="mt-4 text-xs px-3 py-1.5 rounded-full bg-purple-900/50 hover:bg-purple-800 text-purple-200 transition">
                     ${L.copy_btn}
                 </button>
@@ -726,18 +726,23 @@
         `;
     }
 
-    function copyResult(text) {
+    function copyResult(btn, text) {
+        if (!navigator.clipboard || typeof navigator.clipboard.writeText !== 'function') return;
         navigator.clipboard.writeText(text).then(() => {
-            const btn = event.target;
-            const original = btn.textContent;
+            if (!btn) return;
+            if (!btn.dataset.origLabel) btn.dataset.origLabel = btn.textContent;
             btn.textContent = LANGUAGES[currentLang].copied;
-            setTimeout(() => btn.textContent = original, 1500);
-        });
+            setTimeout(() => { btn.textContent = btn.dataset.origLabel; }, 1500);
+        }).catch(() => {});
     }
 
     // --- Init ---
     window.onload = function() {
-        initWebGL();
+        try {
+            initWebGL();
+        } catch (err) {
+            console.warn('WebGL disabled:', err);
+        }
 
         const urlParams = new URLSearchParams(window.location.search);
         const urlLang = urlParams.get('lang')?.toUpperCase();
