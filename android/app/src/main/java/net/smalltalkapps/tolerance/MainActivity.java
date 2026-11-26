@@ -144,8 +144,36 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Instant launch from bundled assets!
-        mWebView.loadUrl(LOCAL_URL);
+        // Instant launch from bundled assets or HTTPS deep link!
+        mWebView.loadUrl(resolveDeepLinkUrl(getIntent()));
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        if (mWebView != null) {
+            mWebView.loadUrl(resolveDeepLinkUrl(intent));
+        }
+    }
+
+    private String resolveDeepLinkUrl(Intent intent) {
+        if (intent == null || !Intent.ACTION_VIEW.equals(intent.getAction()) || intent.getData() == null) {
+            return LOCAL_URL;
+        }
+        Uri data = intent.getData();
+        String scheme = data.getScheme();
+        String host = data.getHost();
+        if ("https".equalsIgnoreCase(scheme) && HOST_DOMAIN.equalsIgnoreCase(host)) {
+            return data.toString();
+        }
+        if ("tolerance".equalsIgnoreCase(scheme) || ("smalltalk".equalsIgnoreCase(scheme) && "tolerance".equalsIgnoreCase(host))) {
+            String query = data.getEncodedQuery();
+            if (query != null && !query.isEmpty()) {
+                return LOCAL_URL + "?" + query;
+            }
+        }
+        return LOCAL_URL;
     }
 
     private boolean isNetworkAvailable() {

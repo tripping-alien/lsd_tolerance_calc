@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "net.smalltalkapps.tolerance",
+      "sha256_cert_fingerprints": [
+        "5D:85:28:8B:47:B2:17:CB:99:F4:88:A4:51:14:BA:5F:E1:7A:EC:1B:AB:79:98:21:9B:1F:72:FD:DC:4B:A4:A1"
+      ]
+    }
+  }
+]
