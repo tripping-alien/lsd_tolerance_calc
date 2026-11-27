@@ -421,8 +421,7 @@
     };
 
     // --- WebGL ---
-    let scene, camera, renderer, uniforms;
-    const clock = new THREE.Clock();
+    let scene, camera, renderer, uniforms, clock;
 
     const VERTEX_SHADER = `
         varying vec2 vUv;
@@ -517,6 +516,7 @@
     }
 
     function initWebGL() {
+        clock = new THREE.Clock();
         const canvas = document.getElementById('webgl-container');
         scene = new THREE.Scene();
         camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
