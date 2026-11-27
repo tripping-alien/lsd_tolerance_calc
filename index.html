@@ -14,7 +14,8 @@
     <meta name="description" content="Educational LSD Tolerance Calculator based on a 7-day receptor downregulation model. Includes a WebGL rainbow background and multilingual support.">
     <meta name="keywords" content="LSD, tolerance, calculator, dosing, psychedelic, 5-HT2A, microdosing, pharmacology, WebGL, three.js">
     <meta name="author" content="Gemini Model">
-    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
     <link rel="canonical" href="https://lsd-tolerance-calc.onrender.com/">
 
     <!-- Social Media / Open Graph Tags -->
@@ -59,10 +60,8 @@
     <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
     <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 
-    <script src="tailwind.js"></script>
-    <script>if (!window.tailwind) document.write('<script src="https://cdn.tailwindcss.com"><\/script>');</script>
-    <script src="three.min.js"></script>
-    <script>if (!window.THREE) document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');</script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@700&family=Rubik:wght@400;600;700&display=swap');
@@ -300,21 +299,21 @@
                 <div class="space-y-4">
                     <!-- Time of Last Dose -->
                     <div class="flex flex-col">
-                        <label for="lastDoseTime" id="label-time" class="text-sm font-medium text-gray-200 mb-1.5"></label>
+                        <label for="lastDoseTime" id="label-time" class="text-sm font-medium text-gray-200 mb-1.5">Time Since Last Dose</label>
                         <input type="datetime-local" id="lastDoseTime" required class="input-field p-3 rounded-lg">
                     </div>
 
                     <!-- Last Dose -->
                     <div class="flex flex-col">
-                        <label for="lastDoseMg" id="label-last-dose" class="text-sm font-medium text-gray-200 mb-1.5"></label>
+                        <label for="lastDoseMg" id="label-last-dose" class="text-sm font-medium text-gray-200 mb-1.5">Last Dose Amount (μg / Standard Units)</label>
                         <input type="number" id="lastDoseMg" value="100" min="1" step="1" required class="input-field p-3 rounded-lg" placeholder="e.g. 100">
                     </div>
 
                     <!-- Desired Dose -->
                     <div class="flex flex-col">
-                        <label for="desiredDoseMg" id="label-desired-dose" class="text-sm font-medium text-gray-200 mb-1.5"></label>
+                        <label for="desiredDoseMg" id="label-desired-dose" class="text-sm font-medium text-gray-200 mb-1.5">Desired Target Dose (μg)</label>
                         <input type="number" id="desiredDoseMg" value="100" min="1" step="1" required class="input-field p-3 rounded-lg" placeholder="e.g. 100">
-                        <p id="label-desired-sub" class="text-xs text-gray-400 mt-1.5"></p>
+                        <p id="label-desired-sub" class="text-xs text-gray-400 mt-1.5">Enter your desired baseline intensity to calculate the adjusted dosage accounting for 5-HT2A tolerance recovery over a full 7-day baseline cycle.</p>
                     </div>
                 </div>
 
@@ -328,8 +327,8 @@
 
                 <!-- Disclaimer -->
                 <div class="mt-6 p-4 rounded-xl text-xs disclaimer-box">
-                    <h3 id="disclaimer-title" class="font-bold text-sm mb-1.5"></h3>
-                    <p id="disclaimer-body" class="leading-relaxed"></p>
+                    <h3 id="disclaimer-title" class="font-bold text-sm mb-1.5">Educational Harm Reduction Notice</h3>
+                    <p id="disclaimer-body" class="leading-relaxed">This mathematical curve is an educational harm-reduction estimation tool based on community-reported 5-HT2A serotonin receptor downregulation over 7 to 14 days. Individual pharmacology varies; verify dosing safely and responsibly.</p>
                 </div>
                 <footer class="mt-6 text-center text-xs opacity-75">
                     <span>Developed by <a href="https://smalltalkapps.art/" target="_blank" rel="noopener" class="underline font-semibold hover:text-emerald-400">SmallTalk Apps</a> &bull; Harm Reduction &amp; Scientific Education</span>
